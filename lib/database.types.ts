@@ -475,6 +475,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      adjust_stock: {
+        Args: {
+          p_actor_id: string
+          p_new_qty: number
+          p_product_id: string
+          p_reason: string
+        }
+        Returns: undefined
+      }
+      create_product: {
+        Args: {
+          p_actor_id: string
+          p_category: string
+          p_cost_price: number
+          p_low_stock_threshold: number
+          p_name: string
+          p_sell_price: number
+          p_stock_qty: number
+        }
+        Returns: string
+      }
       create_shop_with_owner: {
         Args: {
           p_name: string
@@ -501,12 +522,29 @@ export type Database = {
         Args: { p_pin_hash: string; p_staff_id: string }
         Returns: undefined
       }
+      set_product_active: {
+        Args: { p_active: boolean; p_actor_id: string; p_product_id: string }
+        Returns: undefined
+      }
       set_staff_active: {
         Args: { p_active: boolean; p_staff_id: string }
         Returns: undefined
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      update_product: {
+        Args: {
+          p_actor_id: string
+          p_apply_cost: boolean
+          p_category: string
+          p_cost_price: number
+          p_low_stock_threshold: number
+          p_name: string
+          p_product_id: string
+          p_sell_price: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

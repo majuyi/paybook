@@ -26,6 +26,12 @@ export function TopNav({ shopName }: { shopName: string }) {
             <Link href="/" className="text-neutral-600 hover:text-neutral-900">
               Dashboard
             </Link>
+            <Link
+              href="/inventory"
+              className="text-neutral-600 hover:text-neutral-900"
+            >
+              Inventory
+            </Link>
             {role === 'owner' && (
               <Link
                 href="/staff"
