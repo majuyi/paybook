@@ -7,7 +7,6 @@ import { sendWhatsAppMessage } from '@/lib/whatsapp-dispatch'
 export const dynamic = 'force-dynamic'
 
 const RETRY_AFTER_MS = 30 * 60 * 1000 // §10.3: retry once after 30 minutes
-const DUE_WINDOW_MIN = 5 // §13: dispatch within 5 minutes of scheduled time
 
 type Dispatch = {
   status: 'sent' | 'pending_retry' | 'failed'
@@ -57,9 +56,11 @@ function decideAction(
     }
     return 'skip'
   }
-  // No record yet: due if the scheduled time fell within the last window.
+  // No record yet: due once today's scheduled time has passed (the 'sent' record
+  // dedupes repeats). On Pro (5-min cron) this fires within ~5 min of the
+  // scheduled time; on Hobby (daily cron) it fires on that day's single run.
   const since = nowMinutes - scheduled
-  return since >= 0 && since < DUE_WINDOW_MIN ? 'first' : 'skip'
+  return since >= 0 ? 'first' : 'skip'
 }
 
 function normalize(raw: Record<string, unknown>): BriefingData {

@@ -107,18 +107,24 @@ works today without any of this.
 
 ## 7. Vercel cron (briefing scheduler)
 
-`vercel.json` registers a cron that calls `/api/cron/briefing` every 5 minutes.
-The handler checks each shop's `briefing_time`/`timezone` and dispatches the ones
-due within the last 5 minutes (dedup + retry-once via the `briefing_dispatches`
-table).
+`vercel.json` registers a cron that calls `/api/cron/briefing`. On each run the
+handler dispatches every `briefing_enabled` shop whose `briefing_time` has passed
+that day (in the shop's timezone) and hasn't been sent yet — deduped + retried
+once via the `briefing_dispatches` table.
+
+The committed schedule is **`0 19 * * *`** (daily at 19:00 UTC = 20:00
+Africa/Lagos, the default `briefing_time`) so it works on the **Vercel Hobby**
+plan, which only allows one cron run per day.
 
 Setup:
 
 1. Set **`CRON_SECRET`** in the Vercel project env (same value everywhere).
    Vercel Cron automatically sends `Authorization: Bearer <CRON_SECRET>`.
-2. The `*/5 * * * *` schedule requires a **Vercel Pro** plan (Hobby runs crons
-   once per day only). On Hobby, change the schedule in `vercel.json` and accept
-   coarser timing.
+2. **Hobby limitation:** a single daily run can't honor arbitrary per-shop
+   `briefing_time`s — shops are effectively briefed around the daily run time,
+   and a shop whose time is *after* the run may slip to the next day. For true
+   per-shop timing, upgrade to **Vercel Pro** and change the schedule to
+   `*/5 * * * *` (every 5 minutes); the handler logic already supports it.
 
 Verify it's firing:
 
