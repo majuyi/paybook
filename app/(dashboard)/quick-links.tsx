@@ -29,6 +29,16 @@ export function QuickLinks() {
           Products, prices, and stock levels.
         </div>
       </Link>
+      {(role === 'owner' || role === 'manager') && (
+        <Link href="/reconciliation" className={card}>
+          <div className="text-sm font-medium text-neutral-900">
+            Reconciliation
+          </div>
+          <div className="mt-0.5 text-sm text-neutral-500">
+            Balance each cashier&apos;s drawer at end of day.
+          </div>
+        </Link>
+      )}
       {role === 'owner' && (
         <Link href="/staff" className={card}>
           <div className="text-sm font-medium text-neutral-900">Staff</div>

@@ -484,6 +484,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      complete_reconciliation: {
+        Args: {
+          p_actor_id: string
+          p_actual_cash: number
+          p_cashier_id: string
+          p_date: string
+        }
+        Returns: undefined
+      }
       create_product: {
         Args: {
           p_actor_id: string
@@ -528,6 +537,23 @@ export type Database = {
       current_user_owns_shop: {
         Args: { target_shop: string }
         Returns: boolean
+      }
+      reconciliation_overview: {
+        Args: { p_date: string }
+        Returns: {
+          cash_total: number
+          cashier_id: string
+          cashier_name: string
+          completed_by_name: string
+          credit_total: number
+          pos_total: number
+          recon_actual: number
+          recon_completed_at: string
+          recon_discrepancy: number
+          recon_expected: number
+          sales_count: number
+          transfer_total: number
+        }[]
       }
       reset_staff_pin: {
         Args: { p_pin_hash: string; p_staff_id: string }

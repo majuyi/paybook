@@ -44,6 +44,14 @@ export function TopNav({ shopName }: { shopName: string }) {
             >
               Inventory
             </Link>
+            {(role === 'owner' || role === 'manager') && (
+              <Link
+                href="/reconciliation"
+                className="text-neutral-600 hover:text-neutral-900"
+              >
+                Reconciliation
+              </Link>
+            )}
             {role === 'owner' && (
               <Link
                 href="/staff"
