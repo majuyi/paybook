@@ -555,6 +555,10 @@ export type Database = {
           transfer_total: number
         }[]
       }
+      record_payment: {
+        Args: { p_actor_id: string; p_amount: number; p_credit_id: string }
+        Returns: undefined
+      }
       reset_staff_pin: {
         Args: { p_pin_hash: string; p_staff_id: string }
         Returns: undefined

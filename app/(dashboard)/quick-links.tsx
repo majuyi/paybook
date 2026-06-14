@@ -39,6 +39,14 @@ export function QuickLinks() {
           </div>
         </Link>
       )}
+      {(role === 'owner' || role === 'manager') && (
+        <Link href="/credit" className={card}>
+          <div className="text-sm font-medium text-neutral-900">Credit</div>
+          <div className="mt-0.5 text-sm text-neutral-500">
+            Track who owes you and record payments.
+          </div>
+        </Link>
+      )}
       {role === 'owner' && (
         <Link href="/staff" className={card}>
           <div className="text-sm font-medium text-neutral-900">Staff</div>
