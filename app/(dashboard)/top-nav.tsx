@@ -61,12 +61,20 @@ export function TopNav({ shopName }: { shopName: string }) {
               </>
             )}
             {role === 'owner' && (
-              <Link
-                href="/staff"
-                className="text-neutral-600 hover:text-neutral-900"
-              >
-                Staff
-              </Link>
+              <>
+                <Link
+                  href="/staff"
+                  className="text-neutral-600 hover:text-neutral-900"
+                >
+                  Staff
+                </Link>
+                <Link
+                  href="/settings"
+                  className="text-neutral-600 hover:text-neutral-900"
+                >
+                  Settings
+                </Link>
+              </>
             )}
           </nav>
         </div>

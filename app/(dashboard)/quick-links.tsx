@@ -55,6 +55,14 @@ export function QuickLinks() {
           </div>
         </Link>
       )}
+      {role === 'owner' && (
+        <Link href="/settings" className={card}>
+          <div className="text-sm font-medium text-neutral-900">Settings</div>
+          <div className="mt-0.5 text-sm text-neutral-500">
+            Shop preferences and data export.
+          </div>
+        </Link>
+      )}
     </div>
   )
 }
