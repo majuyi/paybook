@@ -27,6 +27,18 @@ export function TopNav({ shopName }: { shopName: string }) {
               Dashboard
             </Link>
             <Link
+              href="/sales/new"
+              className="text-neutral-600 hover:text-neutral-900"
+            >
+              New sale
+            </Link>
+            <Link
+              href="/sales"
+              className="text-neutral-600 hover:text-neutral-900"
+            >
+              Sales
+            </Link>
+            <Link
               href="/inventory"
               className="text-neutral-600 hover:text-neutral-900"
             >

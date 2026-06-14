@@ -496,6 +496,17 @@ export type Database = {
         }
         Returns: string
       }
+      create_sale: {
+        Args: {
+          p_actor_id: string
+          p_customer_name: string
+          p_customer_phone: string
+          p_items: Json
+          p_note: string
+          p_payment_method: string
+        }
+        Returns: string
+      }
       create_shop_with_owner: {
         Args: {
           p_name: string
@@ -532,6 +543,10 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      soft_delete_sale: {
+        Args: { p_actor_id: string; p_reason: string; p_sale_id: string }
+        Returns: undefined
+      }
       update_product: {
         Args: {
           p_actor_id: string

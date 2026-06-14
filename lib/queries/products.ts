@@ -20,6 +20,31 @@ export type ProductListItem = Pick<
   | 'is_active'
 >
 
+export type SellableProduct = Pick<
+  ProductRow,
+  'id' | 'name' | 'category' | 'sell_price' | 'stock_qty'
+>
+
+/**
+ * Products that can be added to a sale: active and in stock only. A product at
+ * stock_qty = 0 is not sellable (§5.2), and inactive products never appear in
+ * the picker (§6.2). cost_price is excluded (not needed to sell).
+ */
+export async function listSellableProducts(
+  shopId: string,
+): Promise<SellableProduct[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('products')
+    .select('id, name, category, sell_price, stock_qty')
+    .eq('shop_id', shopId)
+    .eq('is_active', true)
+    .gt('stock_qty', 0)
+    .order('name', { ascending: true })
+
+  return (data ?? []) as SellableProduct[]
+}
+
 export async function listProducts(shopId: string): Promise<ProductListItem[]> {
   const supabase = await createClient()
   const { data } = await supabase

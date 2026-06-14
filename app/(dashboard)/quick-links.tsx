@@ -11,6 +11,18 @@ export function QuickLinks() {
 
   return (
     <div className="mt-6 grid gap-3 sm:grid-cols-2">
+      <Link href="/sales/new" className={card}>
+        <div className="text-sm font-medium text-neutral-900">New sale</div>
+        <div className="mt-0.5 text-sm text-neutral-500">
+          Ring up a sale and record the payment.
+        </div>
+      </Link>
+      <Link href="/sales" className={card}>
+        <div className="text-sm font-medium text-neutral-900">Sales</div>
+        <div className="mt-0.5 text-sm text-neutral-500">
+          Review recent transactions.
+        </div>
+      </Link>
       <Link href="/inventory" className={card}>
         <div className="text-sm font-medium text-neutral-900">Inventory</div>
         <div className="mt-0.5 text-sm text-neutral-500">
