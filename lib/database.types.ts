@@ -87,6 +87,50 @@ export type Database = {
           },
         ]
       }
+      briefing_dispatches: {
+        Row: {
+          attempts: number
+          created_at: string | null
+          date: string
+          error: string | null
+          id: string
+          last_attempt_at: string | null
+          sent_at: string | null
+          shop_id: string | null
+          status: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string | null
+          date: string
+          error?: string | null
+          id?: string
+          last_attempt_at?: string | null
+          sent_at?: string | null
+          shop_id?: string | null
+          status: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string | null
+          date?: string
+          error?: string | null
+          id?: string
+          last_attempt_at?: string | null
+          sent_at?: string | null
+          shop_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "briefing_dispatches_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credit_transactions: {
         Row: {
           amount: number
@@ -483,6 +527,19 @@ export type Database = {
           p_reason: string
         }
         Returns: undefined
+      }
+      briefing_data: {
+        Args: { p_date: string; p_shop_id: string }
+        Returns: {
+          cash_status: string
+          credit_count: number
+          credit_total: number
+          estimated_profit: number
+          low_stock: Json
+          low_stock_more: number
+          sale_count: number
+          total_revenue: number
+        }[]
       }
       complete_reconciliation: {
         Args: {
