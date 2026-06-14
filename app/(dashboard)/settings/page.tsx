@@ -2,7 +2,7 @@ import { requireOwner } from '@/lib/auth'
 import { SettingsContent } from './settings-content'
 
 export default async function SettingsPage() {
-  await requireOwner()
+  const { shop } = await requireOwner()
 
   return (
     <div className="space-y-6">
@@ -12,7 +12,16 @@ export default async function SettingsPage() {
           Shop preferences and data export.
         </p>
       </div>
-      <SettingsContent />
+      <SettingsContent
+        initial={{
+          name: shop.name,
+          whatsappNumber: shop.whatsapp_number,
+          briefingTime: shop.briefing_time.slice(0, 5),
+          briefingEnabled: shop.briefing_enabled,
+          reconTolerance: Number(shop.recon_tolerance),
+          currency: shop.currency,
+        }}
+      />
     </div>
   )
 }
