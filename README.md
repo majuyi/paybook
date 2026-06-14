@@ -44,11 +44,12 @@ Supabase dashboard under **Project Settings → API**.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon/publishable key for the browser + server clients. RLS-protected, safe to expose. | Project Settings → API → Project API keys → `anon` / publishable |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Server-only.** Bypasses RLS. Used by the briefing cron and any privileged path. Never sent to the browser (guarded by `server-only`). | Project Settings → API → Project API keys → `service_role` / secret |
 | `CRON_SECRET` | Bearer token the briefing cron requires. Vercel Cron sends it automatically. | You choose it — a long random string |
-| `WHATSAPP_API_TOKEN` | WhatsApp Business API token (briefing delivery). | Your Twilio / 360dialog console (section 6) |
-| `WHATSAPP_PHONE_NUMBER_ID` | The sending WhatsApp number/sender id. | Your Twilio / 360dialog console (section 6) |
+| `TWILIO_ACCOUNT_SID` | Twilio account SID (briefing delivery). | Twilio console → Account Info |
+| `TWILIO_AUTH_TOKEN` | Twilio auth token. **Server-only.** | Twilio console → Account Info |
+| `TWILIO_WHATSAPP_FROM` | WhatsApp sender, e.g. `whatsapp:+14155238886` (sandbox or approved sender). | Twilio console → Messaging → WhatsApp |
 
-Until both `WHATSAPP_*` are set, the briefing dispatch runs but does not deliver
-(it records the attempt and retries once — by design).
+Until all three `TWILIO_*` vars are set, the briefing dispatch runs but does not
+deliver (it records the attempt and retries once — by design).
 
 ## 4. Database migrations
 
@@ -85,21 +86,24 @@ logs in with the fixed code, no provider charge.
 ## 6. WhatsApp Business API (daily briefing)
 
 The briefing is composed and dispatched by `app/api/cron/briefing/route.ts`; the
-actual send lives in `lib/whatsapp-dispatch.ts`.
+send is implemented against **Twilio's Messages API** in `lib/whatsapp-dispatch.ts`.
 
-1. Get a WhatsApp Business API sender via **Twilio** or **360dialog**.
-2. Set `WHATSAPP_API_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID` (sections 3).
-3. **Implement the provider call** in `lib/whatsapp-dispatch.ts` — it is
-   currently a stub that returns a failure (search for the `TODO`). Make it POST
-   the message and return `{ ok: true }` on a 2xx.
-4. **Register the templates first.** The §9.3 credit reminder and the §10.1
-   briefing text must be registered/approved with the Business API before they
-   can be sent. The reminder template text is in `lib/whatsapp.ts`; the briefing
-   text is in `lib/briefing.ts`.
+1. **Test fast with the Twilio WhatsApp sandbox.** Twilio console → Messaging →
+   Try it out → WhatsApp. Join the sandbox from your phone (send the join code to
+   the sandbox number). Set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and
+   `TWILIO_WHATSAPP_FROM=whatsapp:+14155238886` (the sandbox number). Sandbox
+   freeform messages deliver to joined numbers — enough to verify end to end.
+2. **For production, register a template.** The daily briefing is
+   business-initiated, so outside a 24-hour user session WhatsApp requires an
+   approved template (freeform fails with Twilio error `63016`). Register the
+   §10.1 briefing as a Twilio **Content template** and switch the send from
+   `Body` to `ContentSid` + `ContentVariables` in `lib/whatsapp-dispatch.ts`.
+   (The §9.3 credit reminder text is in `lib/whatsapp.ts`; the briefing text is in
+   `lib/briefing.ts`.)
 
-Until step 3 is done, briefings record `pending_retry` → `failed` and never
-deliver. (The in-app credit reminder button uses a `wa.me` deep link and works
-today without any of this.)
+Until the `TWILIO_*` vars are set, briefings record `pending_retry` → `failed`
+and never deliver. The in-app credit reminder button uses a `wa.me` deep link and
+works today without any of this.
 
 ## 7. Vercel cron (briefing scheduler)
 
