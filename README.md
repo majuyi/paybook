@@ -53,13 +53,13 @@ deliver (it records the attempt and retries once — by design).
 
 ## 4. Database migrations
 
-All schema, RLS, and functions live in `supabase/migrations/` (`0001`–`0011`).
+All schema, RLS, and functions live in `supabase/migrations/` (`0001`–`0012`).
 To apply them to a **fresh** Supabase project:
 
 ```bash
 supabase login                                   # or: supabase login --token <PAT>
 supabase link --project-ref xzscylijovlgfclfofvp # the DB password is requested here
-supabase db push                                 # applies 0001 → 0011 in order
+supabase db push                                 # applies 0001 → 0012 in order
 ```
 
 - `supabase db push` is idempotent — it only applies migrations not yet on the
@@ -150,6 +150,11 @@ Verify it's firing:
 4. Configure the Supabase Auth → URL config to allow your production domain.
 
 ---
+
+## Feature docs
+
+- [FRD Addendum — Feature 7: In-App Dashboard Summary](docs/frd-addendum-feature-7-dashboard-summary.md)
+  — the home "today" overview (same figures as the §10 briefing, live).
 
 ## Architecture notes (the non-obvious bits)
 

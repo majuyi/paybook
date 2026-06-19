@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { composeBriefing, type BriefingData } from '@/lib/briefing'
+import { composeBriefing, normalizeBriefingData } from '@/lib/briefing'
 import { sendWhatsAppMessage } from '@/lib/whatsapp-dispatch'
 
 // This route reads request-time data and must never be statically cached.
@@ -63,25 +63,6 @@ function decideAction(
   return since >= 0 ? 'first' : 'skip'
 }
 
-function normalize(raw: Record<string, unknown>): BriefingData {
-  const lowStock = Array.isArray(raw.low_stock)
-    ? (raw.low_stock as { name: string; qty: number }[]).map((x) => ({
-        name: String(x.name),
-        qty: Number(x.qty),
-      }))
-    : []
-  return {
-    totalRevenue: Number(raw.total_revenue),
-    estimatedProfit: Number(raw.estimated_profit),
-    saleCount: Number(raw.sale_count),
-    cashStatus: String(raw.cash_status),
-    lowStock,
-    lowStockMore: Number(raw.low_stock_more),
-    creditCount: Number(raw.credit_count),
-    creditTotal: Number(raw.credit_total),
-  }
-}
-
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET
   if (!secret) {
@@ -113,7 +94,7 @@ export async function GET(request: NextRequest) {
       p_shop_id: shop.id,
       p_date: date,
     })
-    const data = normalize((rows?.[0] ?? {}) as Record<string, unknown>)
+    const data = normalizeBriefingData((rows?.[0] ?? {}) as Record<string, unknown>)
     const message = composeBriefing(shop.name, date, data)
 
     if (dryRun) {

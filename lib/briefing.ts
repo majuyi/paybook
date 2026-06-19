@@ -13,6 +13,30 @@ const money = (n: number) =>
   n.toLocaleString('en-NG', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
 
 /**
+ * Coerce a raw row from briefing_data / dashboard_summary into BriefingData.
+ * Both RPCs return the same eight columns; numbers arrive as strings over the
+ * wire for numeric/jsonb, so everything is re-parsed here.
+ */
+export function normalizeBriefingData(raw: Record<string, unknown>): BriefingData {
+  const lowStock = Array.isArray(raw.low_stock)
+    ? (raw.low_stock as { name: string; qty: number }[]).map((x) => ({
+        name: String(x.name),
+        qty: Number(x.qty),
+      }))
+    : []
+  return {
+    totalRevenue: Number(raw.total_revenue),
+    estimatedProfit: Number(raw.estimated_profit),
+    saleCount: Number(raw.sale_count),
+    cashStatus: String(raw.cash_status),
+    lowStock,
+    lowStockMore: Number(raw.low_stock_more),
+    creditCount: Number(raw.credit_count),
+    creditTotal: Number(raw.credit_total),
+  }
+}
+
+/**
  * The §10.1 briefing message. The "Manage your shop: paybook.ng" footer is in
  * every briefing and is not configurable. No cashier names or per-cashier
  * performance appear here (§10.3) — cash status is the only accountability line

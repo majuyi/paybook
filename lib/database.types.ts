@@ -595,6 +595,19 @@ export type Database = {
         Args: { target_shop: string }
         Returns: boolean
       }
+      dashboard_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          cash_status: string
+          credit_count: number
+          credit_total: number
+          estimated_profit: number
+          low_stock: Json
+          low_stock_more: number
+          sale_count: number
+          total_revenue: number
+        }[]
+      }
       reconciliation_overview: {
         Args: { p_date: string }
         Returns: {
