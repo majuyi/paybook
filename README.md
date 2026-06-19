@@ -13,8 +13,11 @@ have access to the Supabase project and (for deploys) the Vercel project.
 
 - Node 18+ and npm
 - [Supabase CLI](https://supabase.com/docs/guides/cli) (`brew install supabase/tap/supabase`)
-- Access to the Supabase project **`paybook`** (ref `xzscylijovlgfclfofvp`, org
-  "The Paybook Organization", region eu-west-1)
+- Access to the two Supabase projects (org "The Paybook Organization"):
+  - **`paybook-dev`** — ref `xzscylijovlgfclfofvp`, region eu-west-1. Migrations
+    land here first; local dev points at it.
+  - **`paybook-prod`** — ref `acbhdldwjcfadtkcdtst`, region eu-central-1.
+    Promoted to only after a change is verified on dev.
 
 ## 2. Fresh clone → running locally
 
@@ -38,6 +41,10 @@ All live in `.env.local` (gitignored). On Vercel, set the same keys in
 **Project → Settings → Environment Variables**. Find the Supabase values in the
 Supabase dashboard under **Project Settings → API**.
 
+> **Which project's keys?** Local `.env.local` uses the **paybook-dev** keys; the
+> Vercel production deploy uses the **paybook-prod** keys. The variable names are
+> identical — only the values differ per environment.
+
 | Variable | What it's for | Where to find it |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL. Public (sent to the browser). | Project Settings → API → Project URL |
@@ -54,16 +61,28 @@ deliver (it records the attempt and retries once — by design).
 ## 4. Database migrations
 
 All schema, RLS, and functions live in `supabase/migrations/` (`0001`–`0012`).
-To apply them to a **fresh** Supabase project:
+Both projects share the same migration files. Apply them **dev first, then
+prod** — never straight to prod — switching targets with `supabase link`:
 
 ```bash
 supabase login                                   # or: supabase login --token <PAT>
-supabase link --project-ref xzscylijovlgfclfofvp # the DB password is requested here
-supabase db push                                 # applies 0001 → 0012 in order
+
+# 1. Dev — apply and verify here first
+supabase link --project-ref xzscylijovlgfclfofvp # paybook-dev; DB password requested here
+supabase db push                                 # applies any migrations not yet on dev
+
+# 2. Prod — only after verifying on dev
+supabase link --project-ref acbhdldwjcfadtkcdtst # paybook-prod
+supabase db push                                 # applies the same migrations to prod
 ```
 
+> Local dev points at **paybook-dev** (`.env.local`). After pushing to prod,
+> re-link back to dev (`supabase link --project-ref xzscylijovlgfclfofvp`) so
+> local commands and `supabase migration list` target dev again.
+
 - `supabase db push` is idempotent — it only applies migrations not yet on the
-  remote.
+  remote, so re-running against either project is safe.
+- Check what's pending on the linked project with `supabase migration list --linked`.
 - After any schema change, regenerate the typed client:
   `supabase gen types typescript --linked > lib/database.types.ts`
 - The migrations assume a stock Supabase project (the `pgcrypto`/`gen_random_uuid`
@@ -145,9 +164,11 @@ Verify it's firing:
 ## 8. Deploy (Vercel)
 
 1. Import the repo into Vercel.
-2. Add all env vars from section 3 (production scope).
+2. Add all env vars from section 3 (production scope) — using the **paybook-prod**
+   Supabase keys, not the dev ones.
 3. Deploy. The cron is picked up from `vercel.json`.
-4. Configure the Supabase Auth → URL config to allow your production domain.
+4. Configure the **paybook-prod** Supabase Auth → URL config to allow your
+   production domain.
 
 ---
 
